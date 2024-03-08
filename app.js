@@ -7,6 +7,7 @@ const logger = require('morgan');
 const session = require('express-session');
 const passport = require('passport');
 const cors = require('cors');
+const MongoStore = require('connect-mongo');
 
 const dotenv = require('dotenv');
 dotenv.config();
@@ -44,7 +45,10 @@ app.use(session({
   secret: `${process.env.SESSION_KEY}`,
   resave: false,
   saveUninitialized: true,
-  cookie: { maxAge: 3600000 }  // 세션 타임아웃을 1시간으로 설정
+  cookie: { maxAge: 3600000 },  // 세션 타임아웃을 1시간으로 설정
+  store: MongoStore.create({
+    mongoUrl: process.env.SESSION_DB_URI,
+  }),
 }));
 
 app.use(passport.initialize());

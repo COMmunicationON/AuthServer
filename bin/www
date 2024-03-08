@@ -4,30 +4,52 @@
  * Module dependencies.
  */
 
-var app = require('../app');
-var debug = require('debug')('authserver2:server');
-var http = require('http');
+const app = require('../app');
+const debug = require('debug')('authserver:server');
+const http = require('http');
+const https = require('https');
+const fs = require('fs');
+
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+const httpPort = normalizePort(process.env.HTTP_PORT || '3000');
+const httpsPort = normalizePort(process.env.HTTPS_PORT || '4000');
+app.set('httpPort', httpPort);
+app.set('httpsPort', httpsPort);
 
 /**
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+var httpserver = http.createServer(app);
+
+/**
+ * Create HTTPS server.
+ */
+
+const options = {
+  key: fs.readFileSync(process.env.PRIVATE_KEY),
+  cert: fs.readFileSync(process.env.CERTIFICATE),
+  //ca: fs.readFileSync(process.env.CA),
+};
+var httpsserver = https.createServer(options, app);
 
 /**
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+httpserver.listen(httpPort);
+httpserver.on('error', onError);
+httpserver.on('listening', onListening);
+
+httpsserver.listen(httpsPort);
+httpsserver.on('error', onError);
+httpsserver.on('listening', onListening);
+
+
 
 /**
  * Normalize a port into a number, string, or false.
@@ -50,7 +72,7 @@ function normalizePort(val) {
 }
 
 /**
- * Event listener for HTTP server "error" event.
+ * Event listener for server "error" event.
  */
 
 function onError(error) {
@@ -78,14 +100,14 @@ function onError(error) {
 }
 
 /**
- * Event listener for HTTP server "listening" event.
+ * Event listener for server "listening" event.
  */
 
 function onListening() {
-  var addr = server.address();
+  var addr = httpserver.address();
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
-  console.log('Auth Server is running on port ' + addr.port + '\n');
+  console.log('Auth Server is running on ports (HTTP) ' + httpPort + ' and (HTTPS) ' + httpsPort + '\n');
 }

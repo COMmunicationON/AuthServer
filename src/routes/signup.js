@@ -5,7 +5,7 @@ const User = require('../models/users');
 
 var router = express.Router();
 
-router.post('/', async function (req, res, next) {
+router.post('/local', async function (req, res, next) {
     const { username, userid, password } = req.body;
 
     if (!userid || !password) {
@@ -39,6 +39,10 @@ router.post('/', async function (req, res, next) {
         console.error(err);
         return res.status(500).json({ error: 'Internal Server Error' });
     }
+});
+
+router.post('/google', async (req, res, next) => {
+
 });
 
 module.exports = router;

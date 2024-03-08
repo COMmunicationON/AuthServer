@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
     username: { type: String, required: true },
     userid: { type: String, required: true, unique: true },
     password: { type: String, required: true, unique: true },
+    provider: { type: String, required: ture },
     createAt: { type: Date, default: Date.now },
 });
 
