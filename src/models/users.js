@@ -5,9 +5,8 @@ const userSchema = new mongoose.Schema({
     username: { type: String, required: true },
     userid: { type: String, required: true, unique: true },
     password: { type: String, required: true, unique: true },
-    provider: { type: String, required: ture },
     createAt: { type: Date, default: Date.now },
-});
+}, { collection: 'users' });
 
 // 모델 생성
 const User = mongoose.model('User', userSchema);

@@ -1,8 +1,9 @@
 const passport = require('passport');
 const localStrategy = require('./localStrategy');
-const dbController = require('../controllers/dbController');
+const { connectDB, disconnectDB } = require('../controllers/dbController');
 //const jwtStrategy = require('./jwtStrategy');
 //const kakao = require('./kakaoStrategy');
+const User = require('../models/users');
 
 module.exports = () => {
     passport.serializeUser((user, done) => {
@@ -13,7 +14,8 @@ module.exports = () => {
     passport.deserializeUser(async (_id, done) => {
         console.log('\n<passport.deserializeUser 실행>');
         try {
-            const user = await dbController.findUserBy_id(_id);
+            await connectDB();
+            let user = await User.findOne({ _id: _id });
 
             // user를 못 찾은 경우
             if (!user) {
@@ -27,6 +29,8 @@ module.exports = () => {
         } catch (err) {
             console.error('Server error at deserializeUser:', err);
             return done(err);
+        } finally {
+            await disconnectDB();
         }
 
     });

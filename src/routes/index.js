@@ -12,12 +12,18 @@ router.get('/', function (req, res, next) {
   //console.log('\n<res>');
   //console.log(res);
 
+  console.log('request 헤더 확인')
+  console.log(req.headers);
+  console.log(req.session);
+
+
+
   if (req.user) {
     console.log("\n아직 사용자 정보가 req에 저장되어 있음");
-    return res.json({ user_info: true });
+    return res.json({ user_info: true, session: req.session, user: req.user });
   } else {
     console.log("\n사용자 정보가 삭제됨");
-    return res.json({ user_info: false });
+    return res.json({ user_info: false, session: req.session, user: req.user });
   }
 
   //res.render('index', { title: 'COMON' });

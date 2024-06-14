@@ -6,7 +6,7 @@ const logger = require('morgan');
 
 const session = require('express-session');
 const passport = require('passport');
-const cors = require('cors');
+//const cors = require('cors');
 const MongoStore = require('connect-mongo');
 
 const dotenv = require('dotenv');
@@ -30,26 +30,37 @@ app.set('view engine', 'jade');
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false })); // body-parser 역할
 app.use(cookieParser(process.env.SESSION_KEY));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(
-  cors({
-    origin: 'http://localhost:3000',
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin: 'http://localhost:3000',
+//     credentials: true,
+//   })
+// );
 
 app.use(session({
-  secret: `${process.env.SESSION_KEY}`,
-  resave: false,
-  saveUninitialized: true,
-  cookie: { maxAge: 3600000 },  // 세션 타임아웃을 1시간으로 설정
+  secret: `${process.env.SESSION_KEY}`, // 세션 암호화 키
+  resave: false,    // 세션을 항상 저장할지 여부
+  saveUninitialized: false,  // 초기화되지 않은 세션을 저장할지 여부
+  cookie: { secure: true },
   store: MongoStore.create({
-    mongoUrl: process.env.SESSION_DB_URI,
-  }),
+    mongoUrl: `${process.env.SESSION_DB_URI}`
+  })
 }));
+
+// http to https redirection middleware
+/*
+app.use((req, res, next)=>{
+  if(req.secure){
+    next();
+  }else{
+    res.redirect(`https://${req.hostname}:${process.env.HTTPS_PORT}${req.url}`);
+  }
+});
+*/
 
 app.use(passport.initialize());
 app.use(passport.session());
